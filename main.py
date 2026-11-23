@@ -5,6 +5,7 @@ The renderer has already produced entry.png in the repository root.
 This entrypoint only moves that file where the grader expects it.
 """
 
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -20,7 +21,13 @@ def emit_front_page(destination: Path) -> Path:
 
 
 def main() -> None:
-    out_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("out")
+    env_out = os.environ.get("MAKEFUN_OUTPUT_DIR")
+    if env_out:
+        out_dir = Path(env_out)
+    elif len(sys.argv) > 1:
+        out_dir = Path(sys.argv[1])
+    else:
+        out_dir = Path("out")
     emit_front_page(out_dir)
 
 
