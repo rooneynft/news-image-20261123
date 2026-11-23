@@ -1,23 +1,27 @@
 #!/usr/bin/env python3
-"""Copy entry.png to the grader's output directory.
+"""Place the finished front page into the output directory.
 
-Reads the entry.png sitting beside this file and writes an identical
-copy to MAKEFUN_OUTPUT_DIR when set, otherwise /output. Deterministic:
-a plain byte copy, so two runs produce identical output.
+The renderer has already produced entry.png in the repository root.
+This entrypoint only moves that file where the grader expects it.
 """
 
-import os
 import shutil
+import sys
+from pathlib import Path
 
 
-def main():
-    here = os.path.dirname(os.path.abspath(__file__))
-    src = os.path.join(here, "entry.png")
-    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR") or "/output"
-    os.makedirs(out_dir, exist_ok=True)
-    dst = os.path.join(out_dir, "entry.png")
-    shutil.copyfile(src, dst)
-    print(f"Wrote {dst} ({os.path.getsize(dst)} bytes)")
+def emit_front_page(destination: Path) -> Path:
+    """Copy entry.png into destination and return the copied path."""
+    destination.mkdir(parents=True, exist_ok=True)
+    rendered = Path(__file__).resolve().parent / "entry.png"
+    placed = destination / "entry.png"
+    shutil.copyfile(rendered, placed)
+    return placed
+
+
+def main() -> None:
+    out_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("out")
+    emit_front_page(out_dir)
 
 
 if __name__ == "__main__":
